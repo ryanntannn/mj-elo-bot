@@ -4,6 +4,7 @@ import { message } from "telegraf/filters";
 import { handleShoot } from "./lib/handler/shoot.mjs";
 import { handleZimo } from "./lib/handler/zimo.mjs";
 import { handleTransfer } from "./lib/handler/transfer.mjs";
+import { handlePoints } from "./lib/handler/points.mjs";
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
@@ -24,6 +25,10 @@ bot.on(message("text"), async (ctx) => {
 
     case "/transfer":
       await handleTransfer(ctx);
+      break;
+
+    case "/points":
+      await handlePoints(ctx);
       break;
 
     default:
