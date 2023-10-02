@@ -48,8 +48,7 @@ jobs:
               git fetch --all &&
               git reset --hard origin/main &&
               git pull origin main &&
-              sudo docker stop mj-elo-bot-prod &&
-              sudo docker container prune &&
+              sudo docker rm --force /mj-elo-bot-prod &&
               sudo docker build . -t mj-elo-bot
               sudo docker run --name mj-elo-bot-prod -d mj-elo-bot
               '
