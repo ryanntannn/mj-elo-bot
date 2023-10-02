@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-supabase:
+    name: Deploy to Supabase
     runs-on: ubuntu-latest
 
     env:
@@ -24,3 +25,31 @@ jobs:
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
       - run: supabase db push
+
+  deploy-ec2:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build & Deploy
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          HOSTNAME: ${{secrets.SSH_HOST}}
+          USER_NAME: ${{secrets.USER_NAME}}
+
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+
+              # Now we have got the access of EC2 and we will start the deploy .
+              cd mj-elo-bot/ &&
+              git checkout main &&
+              git fetch --all &&
+              git reset --hard origin/main &&
+              git pull origin main &&
+              sudo docker stop mj-elo-bot-prod &&
+              sudo docker container prune &&
+              sudo docker build . -t mj-elo-bot
+              sudo docker run --name mj-elo-bot-prod -d mj-elo-bot
+              '
